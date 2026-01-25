@@ -22,6 +22,7 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
 
   # Skip TLS Verification for self-signed certificates
   insecure_skip_tls_verify = true
+  # qemu_agent = true
 
   node    = "kkproxmox"
   vm_id   = 1000
@@ -44,7 +45,8 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
   boot_command = [
     "<esc><wait>", "e<wait>",
     "<down><down><down><end>",
-    " autoinstall ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/",
+    " autoinstall ds=nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/",
+    #" ip=dhcp cloud-config-url=http://{{.HTTPIP}}:{{.HTTPPort}}/user-data autoinstall ds=nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/",
     "<f10>"
   ]
 
