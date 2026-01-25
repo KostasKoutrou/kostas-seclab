@@ -1,0 +1,16 @@
+autoinstall:
+  version: 1
+  identity:
+    hostname: ubuntu-template
+    username: lab-admin
+    password: "$6$wFmQrqy8bMHGTQ.O$1WWGjLd3buuOov83OY7zJbdw5Z9Gx4C3ueH04GZGHzqz6h7Jy0TelUUOisEt/1GJwQifYKYKVfj17vkd0mk0f0"
+  locale: en_US.UTF-8
+  keyboard: {layout: us}
+  ssh:
+    install-server: true #install openssh
+    allow-pw: true #allow password authentication in ssh
+  packages:
+    - qemu-guest-agent #qemu guest agent so that proxmox retrieves info like IP address.
+    - cloud-init #needed so the VM is configurable via Terraform.
+  storage:
+    layout: {name: direct} #use the entire virtual disk as one big partition.

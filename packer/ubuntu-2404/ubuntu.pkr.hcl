@@ -1,0 +1,39 @@
+# Declare variables, we will pull them later in the packer build command
+variable "proxmox_api_url" { type = string }
+variable "proxmox_api_token_id" { type = string }
+variable "proxmox_api_token_secret" { type = string; sensitive = true }
+
+source "proxmox-iso" "ubuntu-server" { #Resource type and local name
+    proxmox_url = var.proxmox_api_url
+    username = var.proxmox_api_token_id
+    token = var.proxmox_api_token_secret
+
+    node = "kkproxmox"
+    vm_id = 1000
+    vm_name = "ubuntu-2404-template"
+
+    iso_file = "local:iso/ubuntu-24.04.3-live-server-amd64.iso"
+
+    network_adapters {
+        model = "virtio"
+        bridge = "vmbr0" # Will probably change it in the Terraform script, this is only for packer.
+    }
+
+    disks {
+        disk_size = "20G"
+        storage_pool = "local-lvm"
+        type = "scsi"
+        ssd = true
+    }
+
+    boot_command = [
+        "<esc><wait>", "e<wait>",
+        "<down><down><down><end>",
+        " autoinstall ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/",
+        "<f10>"
+    ]
+
+    http_directory = "http"
+    ssh_username = "lab-admin"
+    ssh_timeout = "20m"
+}
