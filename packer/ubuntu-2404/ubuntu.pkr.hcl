@@ -1,3 +1,12 @@
+packer {
+  required_plugins {
+    name = {
+      version = "~> 1"
+      source  = "github.com/hashicorp/proxmox"
+    }
+  }
+}
+
 # Declare variables, we will pull them later in the packer build command
 variable "proxmox_api_url" { type = string }
 variable "proxmox_api_token_id" { type = string }
@@ -10,6 +19,9 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
   proxmox_url = var.proxmox_api_url
   username    = var.proxmox_api_token_id
   token       = var.proxmox_api_token_secret
+
+  # Skip TLS Verification for self-signed certificates
+  insecure_skip_tls_verify = true
 
   node    = "kkproxmox"
   vm_id   = 1000
