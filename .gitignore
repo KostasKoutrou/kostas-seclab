@@ -1,0 +1,12 @@
+# Ignore Terraform temp files and state
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# Ignore Packer cache and secrets
+packer_cache/
+*.pkrvars.hcl
+
+# Ignore system junk
+.DS_Store
