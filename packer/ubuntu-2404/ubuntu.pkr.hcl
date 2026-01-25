@@ -1,7 +1,10 @@
 # Declare variables, we will pull them later in the packer build command
 variable "proxmox_api_url" { type = string }
 variable "proxmox_api_token_id" { type = string }
-variable "proxmox_api_token_secret" { type = string; sensitive = true }
+variable "proxmox_api_token_secret" {
+    type = string
+    sensitive = true
+}
 
 source "proxmox-iso" "ubuntu-server" { #Resource type and local name
     proxmox_url = var.proxmox_api_url
