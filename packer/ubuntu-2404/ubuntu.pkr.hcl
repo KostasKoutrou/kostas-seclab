@@ -14,6 +14,10 @@ variable "proxmox_api_token_secret" {
   type      = string
   sensitive = true
 }
+variable "ubuntu_pw" {
+  type = string
+  sensitive = true
+}
 
 source "proxmox-iso" "ubuntu-server" { #Resource type and local name
   proxmox_url = var.proxmox_api_url
@@ -30,6 +34,9 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
 
   iso_file = "local:iso/ubuntu-24.04.3-live-server-amd64.iso"
 
+  cores = 4
+  memory = 4096
+
   network_adapters {
     model  = "virtio"
     bridge = "vmbr0" # Will probably change it in the Terraform script, this is only for packer.
@@ -45,13 +52,15 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
   boot_command = [
     "<esc><wait>", "e<wait>",
     "<down><down><down><end>",
-    " autoinstall ds=nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/",
+    # " autoinstall ds=nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/",
+    " autoinstall cloud-config-url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/user-data ds='nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/'",
     #" ip=dhcp cloud-config-url=http://{{.HTTPIP}}:{{.HTTPPort}}/user-data autoinstall ds=nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/",
     "<f10>"
   ]
 
   http_directory = "http"
   ssh_username   = "lab-admin"
+  ssh_password = "${var.ubuntu_pw}"
   ssh_timeout    = "20m"
 }
 
