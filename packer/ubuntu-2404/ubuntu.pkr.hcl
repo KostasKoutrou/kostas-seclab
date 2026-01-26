@@ -32,7 +32,13 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
   vm_id   = 1000
   vm_name = "ubuntu-2404-template"
 
-  iso_file = "local:iso/ubuntu-24.04.3-live-server-amd64.iso"
+  # iso_file = "local:iso/ubuntu-24.04.3-live-server-amd64.iso"
+
+  boot_iso {
+    type = "scsi"
+    iso_file = "local:iso/ubuntu-24.04.3-live-server-amd64.iso"
+    unmount = true
+  }
 
   cores = 4
   memory = 4096
