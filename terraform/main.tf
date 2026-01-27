@@ -16,16 +16,16 @@ resource "proxmox_vm_qemu" "test_server" {
     # bootdisk = "scsi0"
 
     disk {
-        slot = "scsi0"
-        size = "20G"
-        type = "disk"
+        slot    = "ide0"
+        type    = "cloudinit"
         storage = "local-lvm"
     }
 
     disk {
-    slot    = "ide0"
-    type    = "cloudinit"
-    storage = "local-lvm"
+        slot = "scsi0"
+        size = "20G"
+        type = "disk"
+        storage = "local-lvm"
     }
 
     network {
@@ -57,16 +57,16 @@ resource "proxmox_vm_qemu" "test_server1" {
     # bootdisk = "scsi0"
 
     disk {
-        slot = "scsi0"
-        size = "20G"
-        type = "disk"
+        slot    = "ide0"
+        type    = "cloudinit"
         storage = "local-lvm"
     }
 
     disk {
-    slot    = "ide0"
-    type    = "cloudinit"
-    storage = "local-lvm"
+        slot = "scsi0"
+        size = "20G"
+        type = "disk"
+        storage = "local-lvm"
     }
 
     network {
