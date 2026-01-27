@@ -26,7 +26,7 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
 
   # Skip TLS Verification for self-signed certificates
   insecure_skip_tls_verify = true
-  # qemu_agent = true
+  # qemu_agent = true # Default is true anyway
 
   node    = "kkproxmox"
   vm_id   = 1000
@@ -54,6 +54,9 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
     type         = "scsi"
     ssd          = true
   }
+
+  cloud_init = true # add an empty Cloud-Init CDROM driver after the VM has been converted to a template.
+  cloud_init_storage_pool = "local-lvm" # Name of the Proxmox storage pool to store the Cloud-Init CDROM on.
 
   boot_command = [
     "<esc><wait>", "e<wait>",
