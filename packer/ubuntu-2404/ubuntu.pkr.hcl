@@ -35,8 +35,10 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
   # iso_file = "local:iso/ubuntu-24.04.3-live-server-amd64.iso"
 
   boot_iso {
-    type = "scsi"
+    # type = "scsi"
+    type = "ide"
     iso_file = "local:iso/ubuntu-24.04.3-live-server-amd64.iso"
+    iso_checksum = "sha256:c3514bf0056180d09376462a7a1b4f213c1d6e8ea67fae5c25099c6fd3d8274b"
     unmount = true
   }
 
@@ -75,4 +77,32 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
 
 build {
   sources = ["source.proxmox-iso.ubuntu-server"]
+
+  # provisioner "shell" {
+  #   inline = [
+  #     "echo 'Waiting for cloud-init to complete...'",
+  #     "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Still waiting...'; sleep 2; done",
+  #     "sudo cloud-init status --wait",
+  #     "echo 'Cloud-init completed successfully'"
+  #   ]
+  # }
+
+  provisioner "shell" {
+    # execute_command = "echo ${var.ubuntu_pw}| sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+    execute_command = "echo ${var.ubuntu_pw}| {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"
+    inline = [
+      "echo 'Waiting for cloud-init to complete...'",
+      "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Still waiting...'; sleep 2; done",
+      # "cloud-init status --wait 2>&1",
+      # "cloud-init status --wait  > /dev/null 2>&1",
+      # "[ $? -ne 0 ] && echo 'Cloud-init failed' && exit 1",
+      # "echo 'Cloud-init succeeded at ' `date -R`",
+      "echo 'Cloud-init completed successfully'",
+      "echo 'Cleaning up...'",
+      "rm -rf /var/lib/apt/lists/*",
+      "rm -rf /tmp/*",
+      "rm -rf /var/tmp/*",
+      "cloud-init clean --logs --machine-id --seed --configs all"
+    ]
+  }
 }
