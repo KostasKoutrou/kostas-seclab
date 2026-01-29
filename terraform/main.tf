@@ -15,6 +15,9 @@ resource "proxmox_vm_qemu" "test_server" {
     scsihw = "virtio-scsi-pci"
     # bootdisk = "scsi0"
 
+    # This is addeded to the default ciuser "ubuntu". ssh-keygen -t rsa to generate the key pair.
+    sshkeys = "${file("~/.ssh/id_rsa.pub")}"
+
     disk {
         slot    = "ide0"
         type    = "cloudinit"
