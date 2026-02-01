@@ -93,7 +93,7 @@ build {
     inline = [
       "echo 'Waiting for cloud-init to complete...'",
       "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Still waiting...'; sleep 2; done",
-      # "cloud-init status --wait 2>&1",
+      # "cloud-init status --wait 2>&1", # could try to do "while cloud-init status == 2; sleep 2; done"
       # "cloud-init status --wait  > /dev/null 2>&1",
       # "[ $? -ne 0 ] && echo 'Cloud-init failed' && exit 1",
       # "echo 'Cloud-init succeeded at ' `date -R`",
