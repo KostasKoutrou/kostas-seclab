@@ -1,0 +1,17 @@
+---
+- name: Configure Webservers
+  hosts: proxmox
+  # become: true #sudo
+
+  tasks:
+    - name: Set DNS
+      community.proxmox.proxmox_node:
+        api_host: 192.168.0.50
+        api_user: packer@pve
+        api_token_id: packer@pve!packer-token
+        api_token_secret: 
+        node_name: kkproxmox
+        dns:
+          dns1: 1.1.1.1
+          dns2: 8.8.8.8
+          search: kostas.local
