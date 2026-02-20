@@ -1,4 +1,10 @@
 ---
+#before running, run the following:
+#export PROXMOX_HOST="192.168.0.50"
+#export PROXMOX_USER="packer@pve"
+#export PROXMOX_TOKEN_ID="packer-token"
+#export PROXMOX_TOKEN_SECRET="<token_secret>"
+
 - name: Configure Webservers
   hosts: proxmox
   # become: true #sudo
@@ -6,12 +12,13 @@
   tasks:
     - name: Set DNS
       community.proxmox.proxmox_node:
-        api_host: 192.168.0.50
-        api_user: packer@pve
-        api_token_id: packer@pve!packer-token
-        api_token_secret: 
+        #api_host: 192.168.0.50
+        #api_user: packer@pve
+        #api_token_id: packer@pve!packer-token
+        #api_token_secret: 
         node_name: kkproxmox
         dns:
           dns1: 1.1.1.1
           dns2: 8.8.8.8
           search: kostas.local
+      delegate_to: localhost
