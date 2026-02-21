@@ -5,20 +5,38 @@
 #export PROXMOX_TOKEN_ID="packer-token"
 #export PROXMOX_TOKEN_SECRET="<token_secret>"
 
-- name: Configure Webservers
+- name: Configure Proxmox
   hosts: proxmox
+  connection: local
   # become: true #sudo
 
   tasks:
     - name: Set DNS
       community.proxmox.proxmox_node:
-        #api_host: 192.168.0.50
-        #api_user: packer@pve
-        #api_token_id: packer@pve!packer-token
-        #api_token_secret: 
         node_name: kkproxmox
         dns:
           dns1: 1.1.1.1
           dns2: 8.8.8.8
           search: kostas.local
-      delegate_to: localhost
+      # delegate_to: localhost # this is not needed if you have the "connection: local" at the start of the play
+
+    - name: Set Network
+      community.proxmox.proxmox_node_network:
+        node: kkproxmox
+        autostart: true
+        bridge_ports: ""
+        cidr: "10.0.30.2/24"
+        comments: "Internal Zone"
+        iface: "vmbrIZ30"
+        iface_type: "bridge"
+
+    - name: Apply Network
+      community.proxmox.proxmox_node_network:
+        node: kkproxmox
+        state: "apply"
+
+
+
+    # - name: Show raw NW data
+    #   debug:
+    #     var: pve_network_data
