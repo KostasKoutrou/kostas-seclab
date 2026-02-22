@@ -42,7 +42,7 @@
         node: kkproxmox
         state: "apply"
 
-    - name: Set Firewall
+    - name: Set Firewall Aliases
       community.proxmox.proxmox_firewall:
         level: cluster
         aliases:
@@ -52,9 +52,91 @@
             cidr: "172.16.0.0/12"
           - name: subnet192
             cidr: "192.168.0.0/16"
+    
+    - name: Create Firewall Security Groups
+      community.proxmox.proxmox_firewall:
+        level: cluster
+        group_conf: true # Whether security group should be created or deleted
+        state: present # create the group
+        group: "{{ item.group }}"
+      loop:
+        - { group: "allowguesttraffic" }
+        - { group: "blockhomenwtraffic" }
+    
+    - name: Set Firewall Security Groups
+      community.proxmox.proxmox_firewall:
+        level: group
+        group: allowguesttraffic
+        state: present # Create/update/delete firewall rules or security group.
+        update: true # If state=present and if one or more rule/alias/ipset already exists it will update them.
+        rules:
+          - type: in
+            action: ACCEPT
+            source: dc/subnet10
+            pos: 0
+            log: nolog
+            enable: true
+
+    - name: Set Firewall Security Groups rules
+      community.proxmox.proxmox_firewall:
+        level: group
+        state: present
+        update: true
+        group: "{{ item.group }}"
+        rules: "{{ item.rules }}"
+      loop: 
+        - group: "allowguesttraffic"
+          rules:
+            - type: in
+              action: ACCEPT
+              source: dc/subnet10
+              pos: 0
+              log: nolog
+              enable: true
+        - group: "blockhomenwtraffic"
+          rules:
+            - type: in
+              action: ACCEPT
+              source: dc/subnet192
+              pos: 0
+              log: nolog
+              enable: false # disabled but kept just in case, because proxmox has this rule by default
+              comment: "Allow ProxMox Management"
+              dest: 192.168.0.50
+              dport: 8006
+              proto: tcp
+            - type: in
+              action: ACCEPT
+              source: dc/subnet192
+              pos: 1
+              log: nolog
+              enable: true
+              comment: "Allow OPNSense Management"
+              dest: 192.168.0.51
+              dport: 443
+              proto: tcp
+            - type: out
+              action: REJECT
+              pos: 2
+              log: nolog
+              enable: true
+              comment: "Block Local Traffic"
+              dest: dc/subnet192
+
+    - name: Apply Security Groups
+      community.proxmox.proxmox_firewall:
+        level: "{{ item.level }}"
+        
+
+
+    # - name: Enable Firewall on Cluster
+    # - name: Enable Firewall on Node
+
 
     # - name: Get Firewall Config
     #   community.proxmox.proxmox_firewall_info:
+    #     level: group
+    #     group: blockhomenwtraffic
     #   register: debug_data
 
     # - name: Show debug data
