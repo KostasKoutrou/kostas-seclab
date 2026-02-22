@@ -5,9 +5,10 @@
 #export PROXMOX_TOKEN_ID="packer-token"
 #export PROXMOX_TOKEN_SECRET="<token_secret>"
 
-- name: Configure Proxmox
+- name: Configure Proxmox via API
   hosts: proxmox
   connection: local
+  gather_facts: false
   # become: true #sudo
 
   tasks:
@@ -85,7 +86,7 @@
         group: "{{ item.group }}"
         rules: "{{ item.rules }}"
       loop: 
-        - group: "allowguesttraffic"
+        - group: allowguesttraffic
           rules:
             - type: in
               action: ACCEPT
@@ -93,7 +94,7 @@
               pos: 0
               log: nolog
               enable: true
-        - group: "blockhomenwtraffic"
+        - group: blockhomenwtraffic
           rules:
             - type: in
               action: ACCEPT
@@ -126,19 +127,55 @@
     - name: Apply Security Groups
       community.proxmox.proxmox_firewall:
         level: "{{ item.level }}"
-        
-
-
-    # - name: Enable Firewall on Cluster
-    # - name: Enable Firewall on Node
-
-
+        node: "{{ item.node }}"
+        update: true
+        state: present
+        rules:
+          - action: blockhomenwtraffic # same rule for both cluster and node levels
+            pos: 0
+            type: group
+            enable: true
+      loop:
+        - { level: cluster, node: "" }
+        - { level: node, node: kkproxmox }
+          
     # - name: Get Firewall Config
     #   community.proxmox.proxmox_firewall_info:
-    #     level: group
-    #     group: blockhomenwtraffic
+    #     level: node
+    #     node: kkproxmox
     #   register: debug_data
 
     # - name: Show debug data
     #   debug:
     #     var: debug_data
+
+- name: Configure Proxmox via SSH
+  hosts: proxmox
+  gather_facts: false
+
+  tasks:
+    # - name: Enable Firewall on Cluster
+    #   ansible.builtin.command: pvesh set /cluster/firewall/options -enable 1
+    #   changed_when: false
+
+    - name: Check current Cluster Firewall status
+      ansible.builtin.command: pvesh get /cluster/firewall/options --output-format json
+      register: cluster_fw_status
+      changed_when: false
+
+    - name: Enable Firewall on Cluster
+      ansible.builtin.command: pvesh set /cluster/firewall/options -enable 1
+      # Only run this command IF the 'enable' value is not 1 (or if it doesn't exist yet)
+      when: (cluster_fw_status.stdout | from_json).enable | default(0) | int != 1
+
+    - name: Check current Node Firewall status
+      ansible.builtin.command: pvesh get /nodes/kkproxmox/firewall/options --output-format json
+      register: node_fw_status
+      changed_when: false
+
+    - name: Enable Firewall on Cluster
+      ansible.builtin.command: pvesh set /nodes/kkproxmox/firewall/options -enable 1
+      # Only run this command IF the 'enable' value is not 1 (or if it doesn't exist yet)
+      when: (node_fw_status.stdout | from_json).enable | default(0) | int != 1
+
+    # - name: Enable Firewall on Node
