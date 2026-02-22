@@ -25,7 +25,7 @@
       community.proxmox.proxmox_node_network:
         node: kkproxmox
         autostart: true
-        iface_type: "bridge"
+        iface_type: bridge
         iface: "{{ item.iface}}"
         cidr: "{{ item.cidr }}"
         comments: "{{ item.comments }}"
@@ -37,6 +37,13 @@
         - { iface: "vmbrIZ30", cidr: "10.0.30.2/24", comments: "Internal Zone" , bridge_ports: "" , gateway: "" }
         - { iface: "vmbrEUZ40", cidr: "10.0.40.2/24", comments: "End User Zone" , bridge_ports: "" , gateway: "" }
         - { iface: "vmbr0", cidr: "192.168.0.50/24", comments: "Bridge to home router" , bridge_ports: "nic1" , gateway: "192.168.0.1" }
+      
+    - name: Set Network interfaces
+      community.proxmox.proxmox_node_network:
+        node: kkproxmox
+        iface_type: eth
+        iface: nic1
+        comments: "Physical Interface of Proxmox to home router"
 
     - name: Apply Network
       community.proxmox.proxmox_node_network:
@@ -138,11 +145,14 @@
       loop:
         - { level: cluster, node: "" }
         - { level: node, node: kkproxmox }
-          
+
+    # - name: Configure Update Repositories
+
+
     # - name: Get Firewall Config
-    #   community.proxmox.proxmox_firewall_info:
-    #     level: node
-    #     node: kkproxmox
+    #   community.proxmox.proxmox_node_info:
+    #     # level: node
+    #     # node: kkproxmox
     #   register: debug_data
 
     # - name: Show debug data
@@ -173,9 +183,7 @@
       register: node_fw_status
       changed_when: false
 
-    - name: Enable Firewall on Cluster
+    - name: Enable Firewall on Node
       ansible.builtin.command: pvesh set /nodes/kkproxmox/firewall/options -enable 1
       # Only run this command IF the 'enable' value is not 1 (or if it doesn't exist yet)
       when: (node_fw_status.stdout | from_json).enable | default(0) | int != 1
-
-    # - name: Enable Firewall on Node

@@ -1,0 +1,33 @@
+---
+- name: Config Proxmox for OPNSense
+  hosts: proxmox
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - name: Config Firewall OPNSense
+      community.proxmox.proxmox_firewall:
+        level: vm
+        vmid: 100
+        update: true
+        state: present
+        rules:
+          - action: allowguesttraffic # same rule for both cluster and node levels
+            pos: 0
+            type: group
+            enable: true
+          - action: blockhomenwtraffic
+            pos: 1
+            type: group
+            enable: true
+
+    # - name: Config Firewall OPNSense
+    #   community.proxmox.proxmox_firewall_info:
+    #     level: vm
+    #     vmid: 100
+    #   register: debug_fw_opnsense
+
+    # - name: Show debug
+    #   debug:
+    #     var: debug_fw_opnsense
