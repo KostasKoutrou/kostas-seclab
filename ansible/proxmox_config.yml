@@ -19,7 +19,7 @@
           dns1: 1.1.1.1
           dns2: 8.8.8.8
           search: kostas.local
-      # delegate_to: localhost # this is not needed if you have the "connection: local" at the start of the play
+      # delegate_to: localhost # this is not needed if the "connection: local" is at the start of the playbook
 
     - name: Set Network
       community.proxmox.proxmox_node_network:
