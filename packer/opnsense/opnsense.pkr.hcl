@@ -55,9 +55,6 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
     ssd          = true
   }
 
-  cloud_init = true # add an empty Cloud-Init CDROM driver after the VM has been converted to a template.
-  cloud_init_storage_pool = "local-lvm" # Name of the Proxmox storage pool to store the Cloud-Init CDROM on.
-
   boot_command = [
     "<esc><wait>", "e<wait>",
     "<down><down><down><end>",

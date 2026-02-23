@@ -26,7 +26,7 @@
         node: kkproxmox
         autostart: true
         iface_type: bridge
-        iface: "{{ item.iface}}"
+        iface: "{{ item.iface }}"
         cidr: "{{ item.cidr }}"
         comments: "{{ item.comments }}"
         bridge_ports: "{{ item.bridge_ports }}"
