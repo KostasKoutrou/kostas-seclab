@@ -26,19 +26,18 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
   # Skip TLS Verification for self-signed certificates
   insecure_skip_tls_verify = true
   # qemu_agent = true # Default is true anyway
-  node    = "kkproxmox"
-  vm_id   = 1001
+  node = "kkproxmox"
+  vm_id = 1001
   vm_name = "opnsense-template"
-  ssh_username   = "root"
+  ssh_username = "root"
   ssh_password = "opnsense"
-  ssh_timeout    = "20m"
+  ssh_timeout = "20m"
   cores = 4
   memory = 4096
-  os = other
-  cpu_type = host
+  os = "other"
+  cpu_type = "host"
   scsi_controller = "virtio-scsi-pci"
-  cd_files = ["./conf/"] # the opnsense config file resides there. the xml must have the name "config.xml"
-  cd_label = "config"
+
 
   boot_iso {
     # type = "scsi"
@@ -46,6 +45,12 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
     iso_file = "local:iso/OPNsense-25.7-dvd-amd64.iso"
     iso_checksum = "sha256:e4c178840ab1017bf80097424da76d896ef4183fe10696e92f288d0641475871"
     unmount = true
+  }
+
+  additional_iso_files {
+    cd_files = ["${path.root}/conf/"] # the opnsense config file resides there. the xml must have the name "config.xml"
+    cd_label = "config"
+    iso_storage_pool = "local-lvm"
   }
 
   network_adapters {
