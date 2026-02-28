@@ -119,8 +119,8 @@
       <blockpriv>0</blockpriv>
     </wan>
   </interfaces>
-  <dnsmasq version="1.0.8" persisted_at="1772280788.74" description="Dnsmasq DNS and DHCP">
-    <enable>0</enable>
+  <dnsmasq version="1.0.8" persisted_at="1772265948.49" description="Dnsmasq DNS and DHCP">
+    <enable>1</enable>
     <regdhcp>0</regdhcp>
     <regdhcpstatic>0</regdhcpstatic>
     <dhcpfirst>0</dhcpfirst>
@@ -133,7 +133,7 @@
     <strictbind>0</strictbind>
     <dnssec>0</dnssec>
     <regdhcpdomain/>
-    <interface/>
+    <interface>lan</interface>
     <port>0</port>
     <dns_forward_max/>
     <cache_size/>
@@ -196,8 +196,8 @@
   </ntpd>
   <revision>
     <username>root@192.168.0.102</username>
-    <description>/api/qemuguestagent/settings/set made changes</description>
-    <time>1772281352.81</time>
+    <description>/system_advanced_admin.php made changes</description>
+    <time>1772266107.83</time>
   </revision>
   <OPNsense>
     <wireguard>
@@ -732,7 +732,7 @@
         <interface/>
       </general>
     </Hostwatch>
-    <QemuGuestAgent version="1.0.0" persisted_at="1772281352.81" description="QEMU Guest Agent for OPNsense">
+    <QemuGuestAgent version="1.0.0" persisted_at="1772266041.56" description="QEMU Guest Agent for OPNsense">
       <general>
         <Enabled>1</Enabled>
         <LogDebug>0</LogDebug>

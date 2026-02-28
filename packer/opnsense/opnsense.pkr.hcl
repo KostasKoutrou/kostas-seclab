@@ -25,7 +25,7 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
   token       = var.proxmox_api_token_secret
   # Skip TLS Verification for self-signed certificates
   insecure_skip_tls_verify = true
-  # qemu_agent = true # Default is true anyway
+  qemu_agent = true # Default is true anyway
   node = "kkproxmox"
   vm_id = 1001
   vm_name = "opnsense-template"
@@ -48,9 +48,12 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
   }
 
   additional_iso_files {
-    cd_files = ["${path.root}/conf/"] # the opnsense config file resides there. the xml must have the name "config.xml"
+    # cd_files = ["${path.root}/conf/"] # the opnsense config file resides there. the xml must have the name "config.xml"
+    cd_content = {
+    "/conf/config.xml" = file("${path.root}/conf/config.xml")
+    }
     cd_label = "config"
-    iso_storage_pool = "local-lvm"
+    iso_storage_pool = "local"
   }
 
   network_adapters {
@@ -66,20 +69,27 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
   }
 
   boot_command = [
-    # Wait for the Live CD login prompt
-    "<wait45s>",
-    "installer<enter><wait3s>",
+    # there is already a 10 sec wait for boot, adding another 15
+    # start configuration imoprter and select cd1 where the cd_content is stored
+    "<wait14s><enter><wait5s>cd1<enter><wait25s>",
+
+    "installer<enter><wait2s>",
     "opnsense<enter><wait10s>",
     
-    # Accept default Keymap and UFS installation
-    "<enter><wait2s><enter><wait10s><enter><wait2s><spacebar><enter>",
+    # Accept default Keymap and ZFS installation
+    "<enter><wait2s><enter><wait10s><enter><wait2s><spacebar><wait1s><enter><wait1s>",
     
-    # Confirm formatting (Yes)
-    "<left><enter><wait180s>",
+    # Confirm formatting (Yes) and wait 2 minutes for installation
+    "<left><wait1s><enter><wait120s>",
     
-    # Enter the temporary password for the installation phase
+    # Do not change password and reboot
     "<down><wait1s><enter><wait1s><enter>",
 
+    # Enable qemu agent service autostart and Update from console to latest version,
+    # because qemu requires the latest opnsense version
+    "<wait40s>root<enter><wait2s>opnsense<wait5s>"
+    "8<wait1s>sysrc qemu_guest_agent_enable='YES'<wait1s>exit",
+    "12<wait3s>y<enter><wait2s>q"
   ]
 }
 
