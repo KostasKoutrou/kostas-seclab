@@ -87,9 +87,9 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
 
     # Enable qemu agent service autostart and Update from console to latest version,
     # because qemu requires the latest opnsense version
-    "<wait40s>root<enter><wait2s>opnsense<wait5s>"
-    "8<wait1s>sysrc qemu_guest_agent_enable='YES'<wait1s>exit",
-    "12<wait3s>y<enter><wait2s>q"
+    "<wait45s>root<enter><wait2s>opnsense<enter><wait5s>",
+    "8<enter><wait1s>sysrc qemu_guest_agent_enable='YES'<enter><wait1s>exit<enter><wait1s>",
+    "12<enter><wait5s>y<enter><wait2s>q"
   ]
 }
 
