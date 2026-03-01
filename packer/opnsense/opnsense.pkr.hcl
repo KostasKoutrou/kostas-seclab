@@ -33,10 +33,10 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
   ssh_password = "opnsense"
   ssh_timeout = "20m"
   cores = 4
-  memory = 4096
+  memory = 4096 # must be more than 3GB, otherwise the boot_command is different
   os = "other"
   cpu_type = "host"
-  scsi_controller = "virtio-scsi-pci"
+  scsi_controller = "virtio-scsi-single"
 
 
   boot_iso {
@@ -49,12 +49,17 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
 
   additional_iso_files {
     # cd_files = ["${path.root}/conf/"] # the opnsense config file resides there. the xml must have the name "config.xml"
+    # cd_content = {
+    # "/conf/config.xml" = file("${path.root}/conf/config.xml")
+    # }
     cd_content = {
-    "/conf/config.xml" = file("${path.root}/conf/config.xml")
+    "conf/config.xml" = templatefile("${path.root}/conf/config.xml", {
+      dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))})
     }
     cd_label = "config"
     iso_storage_pool = "local"
   }
+  
 
   network_adapters {
     model  = "virtio"
@@ -71,7 +76,7 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
   boot_command = [
     # there is already a 10 sec wait for boot, adding another 15
     # start configuration imoprter and select cd1 where the cd_content is stored
-    "<wait14s><enter><wait5s>cd1<enter><wait25s>",
+    "<wait12s><enter><wait5s>cd1<enter><wait25s>",
 
     "installer<enter><wait2s>",
     "opnsense<enter><wait10s>",
@@ -88,8 +93,8 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
     # Enable qemu agent service autostart and Update from console to latest version,
     # because qemu requires the latest opnsense version
     "<wait45s>root<enter><wait2s>opnsense<enter><wait5s>",
-    "8<enter><wait1s>sysrc qemu_guest_agent_enable='YES'<enter><wait1s>exit<enter><wait1s>",
-    "12<enter><wait5s>y<enter><wait2s>q"
+    "8<enter><wait2s>sysrc qemu_guest_agent_enable='YES'<wait1s><enter><wait1s>exit<enter><wait1s>",
+    "12<enter><wait6s>y<enter><wait3s>q"
   ]
 }
 
