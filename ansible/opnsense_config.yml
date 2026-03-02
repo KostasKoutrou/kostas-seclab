@@ -1,0 +1,12 @@
+---
+- name: Configure OPNSense
+  hosts: opnsense
+  connection: local  # execute modules on controller
+  gather_facts: false
+  
+  tasks:
+    - name: Set Name
+      oxlorg.opnsense.alias:
+        debug: true
+        firewall: "c-opnsense"
+        name: "Test"
