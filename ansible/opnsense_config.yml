@@ -1,12 +1,24 @@
 ---
 - name: Configure OPNSense
   hosts: opnsense
-  connection: local  # execute modules on controller
-  gather_facts: false
+  # connection: local  # execute modules on controller
+  # gather_facts: false
   
   tasks:
-    - name: Set Name
-      oxlorg.opnsense.alias:
-        debug: true
-        firewall: "c-opnsense"
-        name: "Test"
+    # - name: Set Name
+    #   oxlorg.opnsense.alias:
+    #     debug: true
+    #     firewall: "c-opnsense"
+    #     name: "Test"
+
+    - name: Assign Interfaces
+      puzzle.opnsense.interfaces_assignments:
+        description: "{{ item.description }}"
+        device: "{{ item.device }}"
+        identifier: "{{ item.identifier }}"
+      loop:
+        - { description: "DMZ20", device: "vtnet1", identifier: "opt1" }
+        - { description: "IZ30", device: "vtnet2", identifier: "opt2" }
+        - { description: "EUZ40", device: "vtnet3", identifier: "opt3" }
+        - { description: "WAN", device: "vtnet0", identifier: "wan" }
+
