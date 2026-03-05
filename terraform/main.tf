@@ -208,10 +208,10 @@ resource "proxmox_vm_qemu" "c-opnsense" {
 
     provisioner "remote-exec" {
       inline = [ 
-        "echo 'Injecting Cyber Range Topology by restarting OPNSense...'",
+        "echo 'Injecting Cyber Range Topology by restarting OPNSense. Machine will restart 3 seconds after Terraform has provisioned it.'",
         # "cat /tmp/config.xml",
         # "cp /tmp/config.xml /conf/config.xml"
-        # "reboot"
+        "daemon -f /bin/sh -c 'sleep 3; /sbin/reboot'"
        ]
     }
 }
