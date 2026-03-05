@@ -172,4 +172,44 @@ resource "proxmox_vm_qemu" "c-opnsense" {
         bridge = "vmbrEUZ40"
         firewall = true
     }
+
+    connection {
+      type = "ssh"
+      user = "root"
+      private_key = file("~/.ssh/id_rsa")
+      host = self.ssh_host
+    }
+
+    provisioner "file" {
+      content = templatefile("${path.module}/template_config_opnsense_lab.xml",
+        {
+            dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))
+            wan_if = "vtnet0"
+            wan_descr = "WAN"
+            wan_ip = "192.168.0.51"
+            wan_subnet = "24"
+            wan_gw = "WAN_GW"
+            dmz20_if = "vtnet1"
+            dmz20_descr = "DMZ20"
+            dmz20_ip = "10.0.20.1"
+            dmz20_subnet = "24"
+            iz30_if = "vtnet2"
+            iz30_descr = "IZ30"
+            iz30_ip = "10.0.30.1"
+            iz30_subnet = "24"
+            euz40_if = "vtnet3"
+            euz40_descr = "EUZ40"
+            euz40_ip = "10.0.40.1"
+            euz40_subnet = "24"
+        }
+      )
+      destination = "/conf/config.xml"
+    }
+
+    provisioner "remote-exec" {
+      inline = [ 
+        "echo 'Injecting Cyber Range Topology by restarting OPNSense...'",
+        "reboot"
+       ]
+    }
 }
