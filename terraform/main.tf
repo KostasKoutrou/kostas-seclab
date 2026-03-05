@@ -209,7 +209,9 @@ resource "proxmox_vm_qemu" "c-opnsense" {
     provisioner "remote-exec" {
       inline = [ 
         "echo 'Injecting Cyber Range Topology by restarting OPNSense...'",
-        "reboot"
+        # "cat /tmp/config.xml",
+        # "cp /tmp/config.xml /conf/config.xml"
+        # "reboot"
        ]
     }
 }

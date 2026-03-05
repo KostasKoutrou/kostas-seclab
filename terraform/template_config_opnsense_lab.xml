@@ -140,7 +140,6 @@
       <subnet>${euz40_subnet}</subnet>
     </opt3>
   </interfaces>
-  </interfaces>
   <dnsmasq version="1.0.8" persisted_at="1772280788.74" description="Dnsmasq DNS and DHCP">
     <enable>0</enable>
     <regdhcp>0</regdhcp>
