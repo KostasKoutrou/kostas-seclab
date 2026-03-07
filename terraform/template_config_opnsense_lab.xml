@@ -184,6 +184,24 @@
     <rocommunity>public</rocommunity>
   </snmpd>
   <filter>
+    <!-- This rule is needed to be added at this point to allow management via SSH on the WAN interface -->
+    <rule uuid="cf7ad3fc-4924-4fa6-b9c5-77e6f5d81746">
+      <type>pass</type>
+      <interface>wan</interface>
+      <ipprotocol>inet</ipprotocol>
+      <statetype>keep state</statetype>
+      <direction>in</direction>
+      <log>1</log>
+      <quick>1</quick>
+      <protocol>tcp</protocol>
+      <source>
+        <any>1</any>
+      </source>
+      <destination>
+        <network>wanip</network>
+        <port>22</port>
+      </destination>
+    </rule>
     <rule>
       <type>pass</type>
       <ipprotocol>inet</ipprotocol>

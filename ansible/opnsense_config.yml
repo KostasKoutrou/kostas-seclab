@@ -1,8 +1,8 @@
 ---
-- name: Configure OPNSense
+- name: Configure OPNSense via SSH
   hosts: opnsense
   # connection: local  # execute modules on controller
-  # gather_facts: false
+  gather_facts: false
   
   tasks:
     # - name: Set Name
@@ -21,4 +21,22 @@
         - { description: "IZ30", device: "vtnet2", identifier: "opt2" }
         - { description: "EUZ40", device: "vtnet3", identifier: "opt3" }
         - { description: "WAN", device: "vtnet0", identifier: "wan" }
+  
+- name: Configure OPNSense via API
+  hosts: opnsense
+  # connection: local  # execute modules on controller
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      ssl_verify: false
+      firewall: "192.168.0.51"
+      api_key: "ooyOnJ5Y7NiPxeTXkTxEgM+9steLsU+I+UehjuiXtNdBL0ckTvUQM6PWa5AxpdnUXGLGLtyRQFNCnJI8"
+      api_secret: "3FIUpElt/6/HiZIMha9+VdMfLz7QNntV9rAyySiA4uNIjXMofI3AeokRzz5i3UIUxS376yK3+1bLrqCB"
 
+
+  tasks:
+    - name: Configure DHCP EUZ40
+      oxlorg.opnsense.dhcp_general:
+        enabled: true
+        interfaces: ['opt3']
+        
