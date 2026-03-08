@@ -10,5 +10,8 @@ packer_cache/
 *.pkrvars.hcl
 packer/credentials.pkr.hcl
 
+# Ignore Ansible Credentials
+ansible/OPNsense.internal_root_apikey.txt
+
 # Ignore system junk
 .DS_Store

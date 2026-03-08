@@ -5,12 +5,6 @@
   gather_facts: false
   
   tasks:
-    # - name: Set Name
-    #   oxlorg.opnsense.alias:
-    #     debug: true
-    #     firewall: "c-opnsense"
-    #     name: "Test"
-
     - name: Assign Interfaces
       puzzle.opnsense.interfaces_assignments:
         description: "{{ item.description }}"
@@ -21,22 +15,36 @@
         - { description: "IZ30", device: "vtnet2", identifier: "opt2" }
         - { description: "EUZ40", device: "vtnet3", identifier: "opt3" }
         - { description: "WAN", device: "vtnet0", identifier: "wan" }
-  
+
+
 - name: Configure OPNSense via API
   hosts: opnsense
-  # connection: local  # execute modules on controller
+  connection: local  # execute modules on controller
   gather_facts: false
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
   module_defaults:
     group/oxlorg.opnsense.all:
       ssl_verify: false
-      firewall: "192.168.0.51"
-      api_key: "ooyOnJ5Y7NiPxeTXkTxEgM+9steLsU+I+UehjuiXtNdBL0ckTvUQM6PWa5AxpdnUXGLGLtyRQFNCnJI8"
-      api_secret: "3FIUpElt/6/HiZIMha9+VdMfLz7QNntV9rAyySiA4uNIjXMofI3AeokRzz5i3UIUxS376yK3+1bLrqCB"
-
+      firewall: "{{ inventory_hostname }}"
+      api_credential_file: "{{ playbook_dir }}/OPNsense.internal_root_apikey.txt"
 
   tasks:
-    - name: Configure DHCP EUZ40
+    - name: Enable Kea DHCP EUZ40
       oxlorg.opnsense.dhcp_general:
         enabled: true
         interfaces: ['opt3']
+        fw_rules: true
         
+    - name: Set Kea DHCP EUZ40 Subnet
+      oxlorg.opnsense.dhcp_subnet:
+        subnet: "10.0.40.0/24"
+        pools: ["10.0.40.150-10.0.40.200"]
+        dns: ["1.1.1.1", "8.8.8.8"]
+        ipv: 4
+
+    # - name: Set Kea DHCP Control agent
+    #   oxlorg.opnsense.dhcp_controlagent:
+    #     enabled: true
+    #     http_host: 127.0.0.1
+    #     http_port: 8000
