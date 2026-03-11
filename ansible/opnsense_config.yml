@@ -48,3 +48,34 @@
     #     enabled: true
     #     http_host: 127.0.0.1
     #     http_port: 8000
+
+    - name: Set Firewall Rules
+      oxlorg.opnsense.rule_multi:
+        rules:
+        - description: 'Allow HTTPS to OPNSense WebUI' #name: 'Allow HTTPS to OPNSense WebUI'
+          source_net: 'wan'
+          destination_net: 'wanip'
+          destination_port: 443
+          interface: ['wan']
+          protocol: 'TCP'
+          action: 'pass'
+
+        - description: 'EUZ40 allow all traffic' #name: EUZ40 allow all traffic
+          source_net: 'any'
+          destination_net: 'any'
+          # destination_port: leave empty for all
+          interface: ['opt3']
+          protocol: 'any'
+          action: 'pass'
+          
+        match_fields: ['description']
+        reload: true
+
+    # - name: Listing
+    #   oxlorg.opnsense.list:
+    #     target: 'rule'
+    #   register: existing_entries
+
+    # - name: Printing rules
+    #   ansible.builtin.debug:
+    #     var: existing_entries.data
