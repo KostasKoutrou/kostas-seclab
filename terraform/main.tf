@@ -186,7 +186,7 @@ resource "proxmox_vm_qemu" "c-opnsense" {
             dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))
             wan_if = "vtnet0"
             wan_descr = "WAN"
-            wan_ip = "192.168.0.52"
+            wan_ip = "192.168.0.51"
             wan_subnet = "24"
             wan_gw = "WAN_GW"
             dmz20_if = "vtnet1"

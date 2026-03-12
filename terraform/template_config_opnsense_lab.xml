@@ -31,7 +31,7 @@
       <landing_page/>
       <comment/>
       <email/>
-      <apikeys/>
+      <apikeys>ooyOnJ5Y7NiPxeTXkTxEgM+9steLsU+I+UehjuiXtNdBL0ckTvUQM6PWa5AxpdnUXGLGLtyRQFNCnJI8|$6$$c9GWtGrIy25Ez358v52fDrfyTfD3Q5rnzVlc7je/MKL0EzxnTOrOL0mnSh78O.t6iA8hrtd4.OfsWUvUhJgCl0</apikeys>
       <priv/>
       <language/>
       <descr>System Administrator</descr>
@@ -201,6 +201,29 @@
         <network>wanip</network>
         <port>22</port>
       </destination>
+    </rule>
+    <rule uuid="7409d103-737c-4866-83d8-2c1adc5dbcf7">
+      <enabled>1</enabled>
+      <statetype>keep</statetype>
+      <state-policy/>
+      <action>pass</action>
+      <quick>1</quick>
+      <interfacenot>0</interfacenot>
+      <interface>wan</interface>
+      <direction>in</direction>
+      <ipprotocol>inet</ipprotocol>
+      <protocol>TCP</protocol>
+      <source_net>wan</source_net>
+      <source_not>0</source_not>
+      <destination_net>wanip</destination_net>
+      <destination_not>0</destination_not>
+      <destination_port>443</destination_port>
+      <disablereplyto>0</disablereplyto>
+      <log>1</log>
+      <allowopts>0</allowopts>
+      <nosync>0</nosync>
+      <nopfsync>0</nopfsync>
+      <description>Allow HTTPS to OPNSense WebUI</description>
     </rule>
     <rule>
       <type>pass</type>
