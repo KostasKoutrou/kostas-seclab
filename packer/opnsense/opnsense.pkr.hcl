@@ -33,7 +33,7 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
   ssh_password = "opnsense"
   ssh_timeout = "20m"
   cores = 4
-  memory = 4096 # must be more than 3GB, otherwise the boot_command is different
+  memory = 4096 # must be more than 3GB, otherwise the boot_command is different and will not work
   os = "other"
   cpu_type = "host"
   scsi_controller = "virtio-scsi-single"

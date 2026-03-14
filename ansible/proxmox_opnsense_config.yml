@@ -9,7 +9,7 @@
     - name: Config Firewall OPNSense
       community.proxmox.proxmox_firewall:
         level: vm
-        vmid: 100
+        vmid: 101
         update: true
         state: present
         rules:
@@ -22,6 +22,7 @@
             type: group
             enable: true
 
+    # These tasks can be used to retrieve the current config
     # - name: Config Firewall OPNSense
     #   community.proxmox.proxmox_firewall_info:
     #     level: vm

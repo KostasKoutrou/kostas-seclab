@@ -111,20 +111,11 @@ resource "proxmox_vm_qemu" "c-opnsense" {
     # ipconfig0 = "ip=dhcp"
     skip_ipv6 = true
 
-    # pass ssh key somehow
-    # sshkeys = "${file("~/.ssh/id_rsa.pub")}"
-
     cpu {
         cores = 4
         sockets = 1
         type = "host"
     }
-
-    # disk {
-    #     slot    = "ide0"
-    #     type    = "cloudinit"
-    #     storage = "local-lvm"
-    # }
 
     disk {
         slot = "scsi0"
@@ -208,7 +199,7 @@ resource "proxmox_vm_qemu" "c-opnsense" {
 
     provisioner "remote-exec" {
       inline = [ 
-        "echo 'Injecting Cyber Range Topology by restarting OPNSense. Machine will restart 3 seconds after Terraform has provisioned it.'",
+        "echo 'Injecting Cyber Range Topology by restarting OPNSense. VM will restart in 3 seconds...'",
         # "cat /tmp/config.xml",
         # "cp /tmp/config.xml /conf/config.xml"
         "daemon -f /bin/sh -c 'sleep 3; /sbin/reboot'"

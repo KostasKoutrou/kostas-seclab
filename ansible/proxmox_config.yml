@@ -1,18 +1,17 @@
 ---
 #before running, run the following:
-#export PROXMOX_HOST="192.168.0.50"
-#export PROXMOX_USER="packer@pve"
-#export PROXMOX_TOKEN_ID="packer-token"
-#export PROXMOX_TOKEN_SECRET="<token_secret>"
+# export PROXMOX_HOST="192.168.0.50"
+# export PROXMOX_USER="packer@pve"
+# export PROXMOX_TOKEN_ID="packer-token"
+# export PROXMOX_TOKEN_SECRET="<token_secret>"
 
 - name: Configure Proxmox via API
   hosts: proxmox
-  connection: local
+  connection: local # because this play configures Proxmox via API, with this keyword the playbook is executed at the ansible control node instead of SSH'ing and running it locally on the managed node.
   gather_facts: false
-  # become: true #sudo
 
   tasks:
-    - name: Set DNS
+    - name: Set DNS # Task to configure the central DNS settings of Proxmox
       community.proxmox.proxmox_node:
         node_name: kkproxmox
         dns:
@@ -21,7 +20,7 @@
           search: kostas.local
       # delegate_to: localhost # this is not needed if the "connection: local" is at the start of the playbook
 
-    - name: Set Network
+    - name: Set Network # Task to create the Virtual Network Bridges in Proxmox
       community.proxmox.proxmox_node_network:
         node: kkproxmox
         autostart: true
@@ -38,19 +37,19 @@
         - { iface: "vmbrEUZ40", cidr: "10.0.40.2/24", comments: "End User Zone" , bridge_ports: "" , gateway: "" }
         - { iface: "vmbr0", cidr: "192.168.0.50/24", comments: "Bridge to home router" , bridge_ports: "nic1" , gateway: "192.168.0.1" }
       
-    - name: Set Network interfaces
+    - name: Set Network interfaces # Task to connect the physical interface to the physical network
       community.proxmox.proxmox_node_network:
         node: kkproxmox
         iface_type: eth
         iface: nic1
         comments: "Physical Interface of Proxmox to home router"
 
-    - name: Apply Network
+    - name: Apply Network # Apply the above network configurations
       community.proxmox.proxmox_node_network:
         node: kkproxmox
         state: "apply"
 
-    - name: Set Firewall Aliases
+    - name: Set Firewall Aliases # Set firewall aliases to be used for the firewall rules below
       community.proxmox.proxmox_firewall:
         level: cluster
         aliases:
@@ -61,7 +60,7 @@
           - name: subnet192
             cidr: "192.168.0.0/16"
     
-    - name: Create Firewall Security Groups
+    - name: Create Firewall Security Groups # security groups to be applied on the different Proxmox levels
       community.proxmox.proxmox_firewall:
         level: cluster
         group_conf: true # Whether security group should be created or deleted
@@ -71,29 +70,15 @@
         - { group: "allowguesttraffic" }
         - { group: "blockhomenwtraffic" }
     
-    - name: Set Firewall Security Groups
+    - name: Set Firewall Security Groups rules # configure rules of the above security groups
       community.proxmox.proxmox_firewall:
         level: group
-        group: allowguesttraffic
         state: present # Create/update/delete firewall rules or security group.
         update: true # If state=present and if one or more rule/alias/ipset already exists it will update them.
-        rules:
-          - type: in
-            action: ACCEPT
-            source: dc/subnet10
-            pos: 0
-            log: nolog
-            enable: true
-
-    - name: Set Firewall Security Groups rules
-      community.proxmox.proxmox_firewall:
-        level: group
-        state: present
-        update: true
         group: "{{ item.group }}"
         rules: "{{ item.rules }}"
       loop: 
-        - group: allowguesttraffic
+        - group: allowguesttraffic # allow/not control traffic from the lab's subnets.
           rules:
             - type: in
               action: ACCEPT
@@ -101,7 +86,7 @@
               pos: 0
               log: nolog
               enable: true
-        - group: blockhomenwtraffic
+        - group: blockhomenwtraffic # block traffic to the home physical network.
           rules:
             - type: in
               action: ACCEPT
@@ -131,7 +116,7 @@
               comment: "Block Local Traffic"
               dest: dc/subnet192
 
-    - name: Apply Security Groups
+    - name: Apply Security Groups # apply security groups for both cluster and node levels
       community.proxmox.proxmox_firewall:
         level: "{{ item.level }}"
         node: "{{ item.node }}"
@@ -146,9 +131,9 @@
         - { level: cluster, node: "" }
         - { level: node, node: kkproxmox }
 
-    # - name: Configure Update Repositories
+    # - name: Configure Update Repositories - left for future update
 
-
+    #The below 2 tasks are useful if it is needed to print the current configuration
     # - name: Get Firewall Config
     #   community.proxmox.proxmox_node_info:
     #     # level: node
@@ -164,10 +149,6 @@
   gather_facts: false
 
   tasks:
-    # - name: Enable Firewall on Cluster
-    #   ansible.builtin.command: pvesh set /cluster/firewall/options -enable 1
-    #   changed_when: false
-
     - name: Check current Cluster Firewall status
       ansible.builtin.command: pvesh get /cluster/firewall/options --output-format json
       register: cluster_fw_status
