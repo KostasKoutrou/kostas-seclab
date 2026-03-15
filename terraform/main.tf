@@ -106,9 +106,7 @@ resource "proxmox_vm_qemu" "c-opnsense" {
     balloon = 4096
     bios = "seabios"
     scsihw = "virtio-scsi-single"
-    # bootdisk = "scsi0"    
     os_type = "other"
-    # ipconfig0 = "ip=dhcp"
     skip_ipv6 = true
 
     cpu {
@@ -136,6 +134,7 @@ resource "proxmox_vm_qemu" "c-opnsense" {
         startup_delay = -1
     }
 
+    # Configure the network interfaces
     network {
         id = 0
         model = "virtio"
@@ -164,6 +163,7 @@ resource "proxmox_vm_qemu" "c-opnsense" {
         firewall = true
     }
 
+    # connection used for the provisioners below
     connection {
       type = "ssh"
       user = "root"
@@ -171,6 +171,8 @@ resource "proxmox_vm_qemu" "c-opnsense" {
       host = self.ssh_host
     }
 
+    # replace the config.xml file with the one below.
+    # This one uses dynamic variables to also configure the network interfaces IPs.
     provisioner "file" {
       content = templatefile("${path.module}/template_config_opnsense_lab.xml",
         {
@@ -197,11 +199,10 @@ resource "proxmox_vm_qemu" "c-opnsense" {
       destination = "/conf/config.xml"
     }
 
+    # reboot the machine so that the new config.xml is applied
     provisioner "remote-exec" {
       inline = [ 
         "echo 'Injecting Cyber Range Topology by restarting OPNSense. VM will restart in 3 seconds...'",
-        # "cat /tmp/config.xml",
-        # "cp /tmp/config.xml /conf/config.xml"
         "daemon -f /bin/sh -c 'sleep 3; /sbin/reboot'"
        ]
     }
