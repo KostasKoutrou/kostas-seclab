@@ -201,6 +201,7 @@
         <network>wanip</network>
         <port>22</port>
       </destination>
+      <description>Allow SSH to OPNSense</description>
     </rule>
     <rule uuid="7409d103-737c-4866-83d8-2c1adc5dbcf7">
       <enabled>1</enabled>
